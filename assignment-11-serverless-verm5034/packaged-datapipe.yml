@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  DataStream:
+    Properties:
+      Name: datastream
+      ShardCount: 1
+      Tags:
+      - Key: Project
+        Value: SEIS665
+    Type: AWS::Kinesis::Stream
+  DatalogFunction:
+    Properties:
+      CodeUri: s3://serverless-datapipe-verm5034/9a4b861802606574aca01b004780d737
+      Events:
+        StreamData:
+          Properties:
+            BatchSize: 50
+            StartingPosition: TRIM_HORIZON
+            Stream:
+              Fn::GetAtt:
+              - DataStream
+              - Arn
+          Type: Kinesis
+      Handler: datalog.lambda_handler
+      MemorySize: 256
+      Policies:
+      - AWSLambdaKinesisExecutionRole
+      Runtime: python3.6
+      Timeout: 15
+    Type: AWS::Serverless::Function
+  DatastoreFunction:
+    Properties:
+      CodeUri: s3://serverless-datapipe-verm5034/fc6ae2887ba5b2894cc5e3d40f6958ea
+      Environment:
+        Variables:
+          TABLE_NAME: DatapipeTable
+      Events:
+        StreamData:
+          Properties:
+            BatchSize: 50
+            StartingPosition: TRIM_HORIZON
+            Stream:
+              Fn::GetAtt:
+              - DataStream
+              - Arn
+          Type: Kinesis
+      Handler: datastore.lambda_handler
+      MemorySize: 256
+      Policies:
+      - AWSLambdaFullAccess
+      Runtime: python3.6
+      Timeout: 15
+    Type: AWS::Serverless::Function
+  DynamoDBTable:
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      SSESpecification:
+        SSEEnabled: true
+      TableName: DatapipeTable
+    Type: AWS::DynamoDB::Table
+Transform: AWS::Serverless-2016-10-31

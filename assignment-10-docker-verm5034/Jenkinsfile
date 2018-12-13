@@ -1,0 +1,39 @@
+pipeline 
+{
+   agent { label 'linux' }	
+   stages 
+   {
+   stage('Linting')
+     {
+      steps {
+	              echo "LINTING-STAGE"
+	              git credentialsId: 'id', url: 'https://github.com/seis665/assignment-10-docker-verm5034.git'
+                      sh 'flake8 site.py requirements.txt'
+	    }
+     }
+   stage('Build') 
+     {       
+      steps {  
+		      echo "BUILD-STAGE"	
+                      sh 'docker build -t classweb:$BUILD_NUMBER .'	      
+            }
+     } 	
+   stage('Test')
+     {
+      steps {
+			echo "TEST-STAGE"
+	                sh 'docker run -d -p 80:8080 --name classweb1 classweb:$BUILD_NUMBER'
+	                sh 'curl $(curl 169.254.169.254/latest/meta-data/local-ipv4) | grep "super"'
+            }
+     }	   
+   }
+   post {
+    always {
+                        echo "Stop Docker Containers"
+	                sh 'docker ps -f name=classweb1 -q | xargs --no-run-if-empty docker stop'
+	                sh 'docker container ls -af name=classweb1 -q | xargs -r docker rm'    
+           }
+       }
+ }
+
+

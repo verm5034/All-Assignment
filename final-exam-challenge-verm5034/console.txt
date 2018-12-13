@@ -1,0 +1,51 @@
+Started by user admin
+Running in Durability level: MAX_SURVIVABILITY
+[Pipeline] node
+Running on ad1188d14eca in /workspace/infrastructure-pipeline
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Setup)
+[Pipeline] git
+Fetching changes from the remote Git repository
+Checking out Revision 915bf8b4cec52065a2f50dd3e2d4aebae28f6c1e (refs/remotes/origin/master)
+Commit message: "Update Jenkinsfile"
+[Pipeline] sh
++ echo Setup stage
+Setup stage
+[Pipeline] sh
++ aws s3 cp dist/seis665/dynacorp/webapp.zip /webapp/
+ > git rev-parse --is-inside-work-tree # timeout=10
+ > git config remote.origin.url https://github.com/seis665/final-exam-challenge-verm5034.git # timeout=10
+Fetching upstream changes from https://github.com/seis665/final-exam-challenge-verm5034.git
+ > git --version # timeout=10
+using GIT_ASKPASS to set credentials id
+ > git fetch --tags --progress https://github.com/seis665/final-exam-challenge-verm5034.git +refs/heads/*:refs/remotes/origin/*
+ > git rev-parse refs/remotes/origin/master^{commit} # timeout=10
+ > git rev-parse refs/remotes/origin/origin/master^{commit} # timeout=10
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 915bf8b4cec52065a2f50dd3e2d4aebae28f6c1e
+ > git branch -a -v --no-abbrev # timeout=10
+ > git branch -D master # timeout=10
+ > git checkout -b master 915bf8b4cec52065a2f50dd3e2d4aebae28f6c1e
+ > git rev-list --no-walk a4738a286ed64ec1d6f485b3534d7419624cb0d6 # timeout=10
+
+usage: aws s3 cp <LocalPath> <S3Uri> or <S3Uri> <LocalPath> or <S3Uri> <S3Uri>
+Error: Invalid argument type
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build)
+Stage "Build" skipped due to earlier failure(s)
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+code which should always run goes here
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 255
+Finished: FAILURE

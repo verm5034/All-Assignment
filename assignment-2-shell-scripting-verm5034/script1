@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# assign first command line argument
+ARG=${1}
+
+# display first provided argument
+echo $ARG1
+

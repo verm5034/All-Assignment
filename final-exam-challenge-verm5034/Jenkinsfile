@@ -1,0 +1,58 @@
+pipeline 
+{
+   agent { label 'linux' }	
+   stages 
+   {
+      stage('Setup')
+      {
+        steps{
+           git credentialsId: 'id', url: ' https://github.com/seis665/final-exam-challenge-verm5034.git'
+            sh "echo Setup stage"
+            sh "aws s3 cp s3://seis665/dynacorp/webapp.zip /webapp/"		
+            sh "unzip '/webapp/*.zip'"
+        }
+      }
+      stage('Build')
+      {
+        steps{
+            sh "echo Build stage"
+            sh "docker build -t dynacorpweb:$BUILD_NUMBER ."
+
+        }
+      }
+      stage('Deploy DB')
+      {
+        steps{
+            sh "echo Deploy DB Table "
+            sh "ansible-playbook -v dynamodb.yaml"
+
+        }
+      }
+        stage('Test Webapp')
+      {
+        steps{
+            sh "echo Deploy DB "
+	withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'jenkins-aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) 
+		{
+            sh   "docker run -d -p 80:8090 --env WEBSITE_TABLE="DynaCorpTable" --name website dynacorpweb:$BUILD_NUMBER"
+	   
+	}
+            
+        }
+      }
+
+}
+   post {
+    always {
+      echo "code always run"
+      sh "cleanWs()"
+      sh 'docker service rm website'  
+      sh 'docker rm DynaCorpTable'
+      sh 'docker ps -f name=website -q | xargs --no-run-if-empty docker stop'
+      sh 'docker container ls -af name=website -q | xargs -r docker rm' 
+      sh 'aws cloudformation delete-stack --stack-name website'
+      
+    }
+  }
+
+   }

@@ -1,0 +1,71 @@
+#!/bin/bash
+
+# assign variables
+ACTION=${1}
+VERSION=1.0.1
+
+function create_file() {
+
+touch "${1}-54321"
+}
+
+function delete_file(){
+
+rm "${1}-54321"
+}
+
+function show_version() {
+
+echo "$VERSION"
+}
+
+
+function display_help() {
+
+cat << EOF
+
+-------------------------------------------------------------------------------
+usage: ${0} {-c|--create|-d|--delete|-v|--version|-h|--help} <filename>
+
+OPTIONS:
+	-c | --create Create a new file
+	-d | --delete Delete a file
+	-v | --version Version of a file
+        -h | --help  Display the command help
+
+Examples:
+	Create a new file:
+		$ ${0} -c foo.text
+
+	Delete a file:
+		$ ${0} -d foo.text
+	
+	Version of a file:
+		$ ${0} -v 
+
+	Display help:
+                $ ${0} -h
+---------------------------------------------------------------------------------
+
+EOF
+}
+
+case "$ACTION" in
+  	   -h|--help)
+		display_help
+		;;
+	   -c|--create)
+		create_file "${2:-server}"
+		;;
+	   -d|--delete)
+		delete_file "${2:-server}"
+		;;
+	   -v|--version)
+		show_version 
+		;;
+	*)
+	echo "Usage ${0} {-c|-d|-h|-v}"
+	exit 1
+esac
+
+
